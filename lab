@@ -70,3 +70,12 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+cd
+git clone https://github.com/RPi-Distro/RTIMULib
+cd ./RTIMULib/Linux/python/
+~/Mycodo/env/bin/python setup.py build
+~/Mycodo/env/bin/python setup.py install
