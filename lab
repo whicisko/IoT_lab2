@@ -1,81 +1,54 @@
-from sense_hat import SenseHat
+from sense_emu import SenseHat
 import time
 
-# Inicjalizacja Sense HAT
 sense = SenseHat()
 
-# Funkcja do odczytu i wyświetlania danych z sensorów
-def odczyt_danych():
-    # Odczyt danych z akcelerometru
-    acceleration = sense.get_accelerometer_raw()
-    print("Akcelerometr:")
-    print("X: {:.2f}".format(acceleration['x']))
-    print("Y: {:.2f}".format(acceleration['y']))
-    print("Z: {:.2f}".format(acceleration['z']))
-
-    # Odczyt danych z żyroskopu
-    gyroscope = sense.get_gyroscope_raw()
-    print("\nŻyroskop:")
-    print("X: {:.2f}".format(gyroscope['x']))
-    print("Y: {:.2f}".format(gyroscope['y']))
-    print("Z: {:.2f}".format(gyroscope['z']))
-
-    # Odczyt danych z magnetometru
+# Funkcja do odczytu danych z sensorów
+def read_sensors():
+    accelerometer = sense.get_accelerometer_raw()
+    gyro = sense.get_gyroscope_raw()
     magnetometer = sense.get_compass_raw()
-    print("\nMagnetometr:")
-    print("North: {:.2f}".format(magnetometer['x']))
-    print("East: {:.2f}".format(magnetometer['y']))
-    print("South: {:.2f}".format(magnetometer['z']))
-
-    # Odczyt danych z termometru
     temperature = sense.get_temperature()
-    print("\nTemperatura: {:.2f}°C".format(temperature))
-
-    # Odczyt danych z czujnika wilgotności
     humidity = sense.get_humidity()
-    print("\nWilgotność: {:.2f}%".format(humidity))
-
-    # Odczyt danych z barometru
     pressure = sense.get_pressure()
-    print("\nCiśnienie: {:.2f} hPa".format(pressure))
+    joystick = sense.stick.get_events()
 
-# Funkcja do obsługi joysticka
-def obsluga_joysticka():
+    return {
+        "accelerometer": accelerometer,
+        "gyroscope": gyro,
+        "magnetometer": magnetometer,
+        "temperature": temperature,
+        "humidity": humidity,
+        "pressure": pressure,
+        "joystick": joystick
+    }
+
+# Funkcja do sterowania wyświetlaczem LED
+def control_led():
+    sense.show_message("Hello, Raspberry Pi!")
+
+# Główna pętla programu
+try:
     while True:
-        for event in sense.stick.get_events():
+        sensor_data = read_sensors()
+        
+        # Wyświetlanie danych z sensorów
+        print("Accelerometer:", sensor_data["accelerometer"])
+        print("Gyroscope:", sensor_data["gyroscope"])
+        print("Magnetometer:", sensor_data["magnetometer"])
+        print("Temperature:", sensor_data["temperature"])
+        print("Humidity:", sensor_data["humidity"])
+        print("Pressure:", sensor_data["pressure"])
+        print("Joystick:", sensor_data["joystick"])
+
+        # Sterowanie wyświetlaczem LED po wciśnięciu joysticka
+        for event in sensor_data["joystick"]:
             if event.action == "pressed":
-                print("\nJoystick:")
-                print("Kierunek: {}".format(event.direction))
-                print("Action: {}".format(event.action))
+                control_led()
 
-# Funkcja do obsługi wyświetlacza LED
-def obsluga_wyswietlacza():
-    message = "Hello, IoT!"
-    sense.show_message(message, scroll_speed=0.05, text_colour=(255, 255, 255), back_colour=(0, 0, 0))
+        time.sleep(1)
 
-# Główna funkcja
-def main():
-    try:
-        # Odczyt i wyświetlenie danych z sensorów
-        odczyt_danych()
-
-        # Obsługa joysticka
-        obsluga_joysticka()
-
-        # Obsługa wyświetlacza LED
-        obsluga_wyswietlacza()
-
-    except KeyboardInterrupt:
-        print("\nPrzerwano przez użytkownika.")
-
-if __name__ == "__main__":
-    main()
-
-
-
-
-cd
-git clone https://github.com/RPi-Distro/RTIMULib
-cd ./RTIMULib/Linux/python/
-~/Mycodo/env/bin/python setup.py build
-~/Mycodo/env/bin/python setup.py install
+except KeyboardInterrupt:
+    print("Program został przerwany.")
+finally:
+    sense.clear()
