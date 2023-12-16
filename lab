@@ -1,0 +1,72 @@
+from sense_hat import SenseHat
+import time
+
+# Inicjalizacja Sense HAT
+sense = SenseHat()
+
+# Funkcja do odczytu i wyświetlania danych z sensorów
+def odczyt_danych():
+    # Odczyt danych z akcelerometru
+    acceleration = sense.get_accelerometer_raw()
+    print("Akcelerometr:")
+    print("X: {:.2f}".format(acceleration['x']))
+    print("Y: {:.2f}".format(acceleration['y']))
+    print("Z: {:.2f}".format(acceleration['z']))
+
+    # Odczyt danych z żyroskopu
+    gyroscope = sense.get_gyroscope_raw()
+    print("\nŻyroskop:")
+    print("X: {:.2f}".format(gyroscope['x']))
+    print("Y: {:.2f}".format(gyroscope['y']))
+    print("Z: {:.2f}".format(gyroscope['z']))
+
+    # Odczyt danych z magnetometru
+    magnetometer = sense.get_compass_raw()
+    print("\nMagnetometr:")
+    print("North: {:.2f}".format(magnetometer['x']))
+    print("East: {:.2f}".format(magnetometer['y']))
+    print("South: {:.2f}".format(magnetometer['z']))
+
+    # Odczyt danych z termometru
+    temperature = sense.get_temperature()
+    print("\nTemperatura: {:.2f}°C".format(temperature))
+
+    # Odczyt danych z czujnika wilgotności
+    humidity = sense.get_humidity()
+    print("\nWilgotność: {:.2f}%".format(humidity))
+
+    # Odczyt danych z barometru
+    pressure = sense.get_pressure()
+    print("\nCiśnienie: {:.2f} hPa".format(pressure))
+
+# Funkcja do obsługi joysticka
+def obsluga_joysticka():
+    while True:
+        for event in sense.stick.get_events():
+            if event.action == "pressed":
+                print("\nJoystick:")
+                print("Kierunek: {}".format(event.direction))
+                print("Action: {}".format(event.action))
+
+# Funkcja do obsługi wyświetlacza LED
+def obsluga_wyswietlacza():
+    message = "Hello, IoT!"
+    sense.show_message(message, scroll_speed=0.05, text_colour=(255, 255, 255), back_colour=(0, 0, 0))
+
+# Główna funkcja
+def main():
+    try:
+        # Odczyt i wyświetlenie danych z sensorów
+        odczyt_danych()
+
+        # Obsługa joysticka
+        obsluga_joysticka()
+
+        # Obsługa wyświetlacza LED
+        obsluga_wyswietlacza()
+
+    except KeyboardInterrupt:
+        print("\nPrzerwano przez użytkownika.")
+
+if __name__ == "__main__":
+    main()
